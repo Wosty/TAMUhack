@@ -7,7 +7,9 @@ from PIL import Image, ImageDraw
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 
 keyVal = "6ab63c83e9914a1794de742dccc30330"
-imgURL = "https://i.groupme.com/640x640.jpeg.ff213177686c41f1ac2998e46402f919.large"
+gabiURL = "https://i.groupme.com/640x640.jpeg.ff213177686c41f1ac2998e46402f919.large"
+wesURL = "https://i.groupme.com/1024x1024.jpeg.422a39028dbc492cab4d5280678643f1.large"
+landonURL = "https://i.groupme.com/800x800.jpeg.bef3d27f7eed40229eeb6fe5b1eff15a.large"
 
 def is_male(attr):
     if attr == 'male':
@@ -182,24 +184,61 @@ def identify_student(faceIds, person_group_id, key, large_person_group_id = None
     try:
        response = requests.request('POST', uri_base + '/face/v1.0/identify/', json=body, data=None, headers=headers, params=params)
        parsed = json.loads(response.text)
+       #print (json.dumps(parsed, sort_keys=True, indent=2))
+       #print(parsed["candidate"]["personId"])
+       for person in parsed:
+            print(person['candidates']["personId"])
+            #return person["faceId"]
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+def delete_group(person_group_id, key):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+
+    headers = {
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {
+        'personGroupId': person_group_id,
+    }
+    body = {}
+
+    try:
+       response = requests.request('DELETE', uri_base + '/face/v1.0/persongroups/' + person_group_id + '/train', json=body, data=None, headers=headers, params=params)
+       parsed = json.loads(response.text)
        print (json.dumps(parsed, sort_keys=True, indent=2))
-       #print(parsed["persistedFaceId"])
     except Exception as e:
         print('Error:')
         print(e)
 
 person_group_id = "class-group-id"
-#create_group(person_group_id, keyVal)
+create_group(person_group_id, keyVal)
 
-name = "Gabi Norsworthy"
-person_id = create_person(person_group_id, name, keyVal)
+gabiName = "Gabi Norsworthy"
+person_id = create_person(person_group_id, gabiName, keyVal)
+add_face(gabiURL, person_group_id, person_id, keyVal)
 
-add_face(imgURL, person_group_id, person_id, keyVal)
+wesName = "Wesley Till"
+person_id = create_person(person_group_id, wesName, keyVal)
+add_face(wesURL, person_group_id, person_id, keyVal)
 
-faceIds = [paraMade(keyVal, imgURL)]
-recogn(keyVal, imgURL)
+landonName = "Landon Creel"
+person_id = create_person(person_group_id, landonName, keyVal)
+add_face(landonURL, person_group_id, person_id, keyVal)
+
+faceIds = [paraMade(keyVal, wesURL)]
+#recogn(keyVal, imgURL)
 
 train_group(person_group_id, keyVal)
 
-print(faceIds)
+#print(faceIds)
+#student_name = 
 identify_student(faceIds, person_group_id, keyVal)
+
+
+
+#print('ARE YOU ' + student_name + '?')
+
+delete_group(person_group_id, keyVal)
