@@ -14,9 +14,7 @@ def home():
 
 @app.route('/recieve', methods=['POST'])
 def recieveImage():
-    data = request.get_json()
-
-    req = requests.get(url)
+    req = requests.get(['media'])
     with open('student.jpg', 'wb') as openFile:
         openFile.write(req.content)
     sleep(60)
