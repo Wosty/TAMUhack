@@ -248,6 +248,7 @@ landonName = "Landon Creel"
 person_id = create_person(person_group_id, landonName, keyVal)
 add_face(landonURL, person_group_id, person_id, keyVal)
 
+##### INSERT VIDEO FEED IMAGE IN PLACE OF LANDONURL ####
 faceIds = [paraMade(keyVal, landonURL)]
 #recogn(keyVal, imgURL)
 
