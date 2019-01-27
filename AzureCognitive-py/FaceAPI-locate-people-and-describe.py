@@ -4,6 +4,11 @@ import requests
 from io import BytesIO
 from PIL import Image, ImageDraw
 
+import http.client, urllib.request, urllib.parse, urllib.error, base64
+
+keyVal = "6ab63c83e9914a1794de742dccc30330"
+imgURL = "https://i.groupme.com/640x640.jpeg.ff213177686c41f1ac2998e46402f919.large"
+
 def is_male(attr):
     if attr == 'male':
         return True
@@ -27,7 +32,7 @@ def paraMade(key, url):
         response = requests.request('POST', uri_base + '/face/v1.0/detect', json=body, data=None, headers=headers, params=params)
         parsed = json.loads(response.text)
         print("\tIn this picture : %s\nWe found that:\n" % url)
-#        print (json.dumps(parsed, sort_keys=True, indent=2))
+        #print (json.dumps(parsed, sort_keys=True, indent=2))
         print("\tThere are %i people" % parsed.__len__())
         for person in parsed:
             print("\t> Person %i:\n\tThis is a %i-year old %s" %(parsed.index(person)+1, person["faceAttributes"]["age"],person["faceAttributes"]["gender"]))
@@ -36,6 +41,7 @@ def paraMade(key, url):
                     print("\tHis face, has the id %s" % (person['faceId']))
                 else:
                     print("\tHer face, has the id %s"% (person['faceId']))
+            return person["faceId"]
     except Exception as e:
         print('Error:')
         print(e)
@@ -63,5 +69,137 @@ def recogn(KEY, img_url):
 
     img.show()
 
-paraMade(sys.argv[1], sys.argv[2])
-recogn(sys.argv[1], sys.argv[2])
+def create_group(person_group_id, key, user_data = None):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+    name = person_group_id
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {
+        'personGroupId': person_group_id,
+    }
+    body = {
+        'name': name,
+        'userData': user_data,
+    }
+
+    try:
+       response = requests.request('PUT', uri_base + '/face/v1.0/persongroups/' + name, json=body, data=None, headers=headers, params=params)
+       parsed = json.loads(response.text)
+       print (json.dumps(parsed, sort_keys=True, indent=2))
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+
+def create_person(person_group_id, person_id, key, user_data = "None"):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {
+        'personGroupId': person_group_id,
+    }
+    body = {
+        "name": person_id,
+        "userData": user_data,
+    }
+
+    try:
+       response = requests.request('POST', uri_base + '/face/v1.0/persongroups/' + person_group_id + '/persons', json=body, data=None, headers=headers, params=params)
+       parsed = json.loads(response.text)
+       #print (json.dumps(parsed, sort_keys=True, indent=2))
+       return parsed["personId"]
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+def add_face(img_url, person_group_id, person_id, key, user_data = None, target_face = None):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {
+        'userData': user_data,
+        'targetFace': target_face,
+    }
+    body = {
+        'url': img_url,
+    }
+    
+    try:
+       response = requests.request('POST', uri_base + '/face/v1.0/persongroups/' + person_group_id + '/persons/' + person_id + '/persistedFaces', json=body, data=None, headers=headers, params=params)
+       parsed = json.loads(response.text)
+       #print (json.dumps(parsed, sort_keys=True, indent=2))
+       #print(parsed["persistedFaceId"])
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+def train_group(person_group_id, key):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+
+    headers = {
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {
+        'personGroupId': person_group_id,
+    }
+    body = {}
+
+    try:
+       requests.request('POST', uri_base + '/face/v1.0/persongroups/' + person_group_id + '/train', json=body, data=None, headers=headers, params=params)
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+
+def identify_student(faceIds, person_group_id, key, large_person_group_id = None, max_students_return = 1, threshold = .4):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {}
+    body = {
+        'personGroupId': person_group_id,
+        'faceIds': faceIds,
+        'maxNumOfCandidatesReturned': max_students_return,
+        'confidenceThreshold': threshold,
+    }
+    
+    try:
+       response = requests.request('POST', uri_base + '/face/v1.0/identify/', json=body, data=None, headers=headers, params=params)
+       parsed = json.loads(response.text)
+       print (json.dumps(parsed, sort_keys=True, indent=2))
+       #print(parsed["persistedFaceId"])
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+person_group_id = "class-group-id"
+#create_group(person_group_id, keyVal)
+
+name = "Gabi Norsworthy"
+person_id = create_person(person_group_id, name, keyVal)
+
+add_face(imgURL, person_group_id, person_id, keyVal)
+
+faceIds = [paraMade(keyVal, imgURL)]
+recogn(keyVal, imgURL)
+
+train_group(person_group_id, keyVal)
+
+print(faceIds)
+identify_student(faceIds, person_group_id, keyVal)
