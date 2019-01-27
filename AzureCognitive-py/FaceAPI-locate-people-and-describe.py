@@ -11,7 +11,7 @@ def is_male(attr):
 
 def paraMade(key, url):
     subscription_key = key
-    uri_base = 'https://eastus.api.cognitive.microsoft.com'
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
     headers = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': subscription_key,
@@ -42,7 +42,7 @@ def paraMade(key, url):
 
 def recogn(KEY, img_url):
     CF.Key.set(KEY)
-    BASE_URL = 'https://eastus.api.cognitive.microsoft.com/face/v1.0/'
+    BASE_URL = 'https://centralus.api.cognitive.microsoft.com/face/v1.0/'
     CF.BaseUrl.set(BASE_URL)
     detected = CF.face.detect(img_url)
     print(detected)
