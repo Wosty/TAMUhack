@@ -249,7 +249,7 @@ person_id = create_person(person_group_id, landonName, keyVal)
 add_face(landonURL, person_group_id, person_id, keyVal)
 
 ##### INSERT VIDEO FEED IMAGE IN PLACE OF LANDONURL ####
-faceIds = [paraMade(keyVal, landonURL)]
+faceIds = [paraMade(keyVal, "https://c2.staticflickr.com/8/7900/46843993652_62026e1aaa_b.jpg")]
 #recogn(keyVal, imgURL)
 
 train_group(person_group_id, keyVal)
@@ -259,6 +259,20 @@ student_id = identify_student(faceIds, person_group_id, keyVal)
 
 student_name = get_student_name(person_group_id, student_id, keyVal)
 
-print('\nARE YOU ' + student_name + '?')
+f = open("Attendance.csv", "r+")
+f.write("Student Name,Student ID\n")
+
+if (student_name == "Landon Creel"):
+    f.write("Landon Creel,123\n")
+
+if (student_name == "Wesley Till"):
+    f.write("Wesley Till,234\n")
+
+if (student_name == "Gabi Norsworthy"):
+    f.write("Gabrielle Norsworthy,345\n")
+
+f.close()
+
+print("\nARE YOU " + student_name + "?")
 
 delete_group(person_group_id, keyVal)
