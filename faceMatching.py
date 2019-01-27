@@ -5,6 +5,6 @@ from studentClass import student
 gabi    = student("Gabi Norsworthy", 11)
 landon  = student("Landon Creel", 12)
 wesley  = student("Wesley Till", 13)
-shikhar = student("Shikhar Barethi", 14)
+shikhar = student("Shikhar Baheti", 14)
 
 studentList = [gabi, landon, wesley, shikhar]
