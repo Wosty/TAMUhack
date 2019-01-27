@@ -185,10 +185,30 @@ def identify_student(faceIds, person_group_id, key, large_person_group_id = None
        response = requests.request('POST', uri_base + '/face/v1.0/identify/', json=body, data=None, headers=headers, params=params)
        parsed = json.loads(response.text)
        #print (json.dumps(parsed, sort_keys=True, indent=2))
-       #print(parsed["candidate"]["personId"])
        for person in parsed:
-            print(person['candidates']["personId"])
-            #return person["faceId"]
+           return (person['candidates'][0]['personId'])
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+def get_student_name(person_group_id, student_id, key):
+    subscription_key = key
+    uri_base = 'https://centralus.api.cognitive.microsoft.com'
+
+    headers = {
+        'Ocp-Apim-Subscription-Key': subscription_key,
+    }
+    params = {
+        'personGroupId': person_group_id,
+        'personId': student_id,
+    }
+    body = {}
+
+    try:
+       response = requests.request('GET', uri_base + '/face/v1.0/persongroups/' + person_group_id + '/persons/' + student_id, json=body, data=None, headers=headers, params=params)
+       parsed = json.loads(response.text)
+       #print (json.dumps(parsed, sort_keys=True, indent=2))
+       return (parsed['name'])
     except Exception as e:
         print('Error:')
         print(e)
@@ -208,7 +228,7 @@ def delete_group(person_group_id, key):
     try:
        response = requests.request('DELETE', uri_base + '/face/v1.0/persongroups/' + person_group_id + '/train', json=body, data=None, headers=headers, params=params)
        parsed = json.loads(response.text)
-       print (json.dumps(parsed, sort_keys=True, indent=2))
+       #print (json.dumps(parsed, sort_keys=True, indent=2))
     except Exception as e:
         print('Error:')
         print(e)
@@ -228,17 +248,16 @@ landonName = "Landon Creel"
 person_id = create_person(person_group_id, landonName, keyVal)
 add_face(landonURL, person_group_id, person_id, keyVal)
 
-faceIds = [paraMade(keyVal, wesURL)]
+faceIds = [paraMade(keyVal, landonURL)]
 #recogn(keyVal, imgURL)
 
 train_group(person_group_id, keyVal)
 
 #print(faceIds)
-#student_name = 
-identify_student(faceIds, person_group_id, keyVal)
+student_id = identify_student(faceIds, person_group_id, keyVal)
 
+student_name = get_student_name(person_group_id, student_id, keyVal)
 
-
-#print('ARE YOU ' + student_name + '?')
+print('\nARE YOU ' + student_name + '?')
 
 delete_group(person_group_id, keyVal)
