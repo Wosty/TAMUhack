@@ -10,6 +10,6 @@ CF.Key.set(KEY)
 BASE_URL = 'https://southcentralus.api.cognitive.microsoft.com/face/v1.0'
 CF.BaseUrl.set(BASE_URL)
 
-img_url = 'https://www.dropbox.com/s/s84x96au7utietc/gabiUIN.jpg?dl=0'
+img_url = 'https://raw.githubusercontent.com/Microsoft/Cognitive-Face-Windows/master/Data/detection1.jpg'
 faces = CF.face.detect(img_url)
 print(faces)
