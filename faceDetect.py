@@ -1,8 +1,5 @@
-
-########### Python 2.7 #############
-import http.client
-import urllib
-import sbase64
+########### Python 3.2 #############
+import http.client, urllib.request, urllib.parse, urllib.error, base64
 
 headers = {
     # Request headers
@@ -10,15 +7,15 @@ headers = {
     'Ocp-Apim-Subscription-Key': 'ed9917a2d6584af18fb22e51f6466956',
 }
 
-params = urllib.urlencode({
+params = urllib.parse.urlencode({
     # Request parameters
     'returnFaceId': 'true',
     'returnFaceLandmarks': 'false',
-    'returnFaceAttributes': '',
+    'returnFaceAttributes': 'age',
 })
 
 try:
-    conn = httplib.HTTPSConnection('southcentralus.api.cognitive.microsoft.com')
+    conn = http.client.HTTPSConnection('southcentralus.api.cognitive.microsoft.com')
     conn.request("POST", "/face/v1.0/detect?%s" % params, "{body}", headers)
     response = conn.getresponse()
     data = response.read()
